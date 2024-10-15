@@ -1,4 +1,4 @@
-import { writeFile } from "fs/promises";
+import { unlink, writeFile } from "fs/promises";
 import { NextResponse } from "next/server";
 
 export async function POST(req: Request) {
@@ -29,4 +29,21 @@ for(const file of files){
  }
 
  return NextResponse.json({ urls });
+}
+
+
+export async function DELETE(req: Request) {
+  const { id } = await req.json();
+
+  if (!id) {
+    return NextResponse.json({ error: 'No id provided' });
+  }
+
+  try {
+    await unlink(`./public/uploads/${id}`);
+    return NextResponse.json({ message: 'File deleted successfully' });
+  } catch (error) {
+    return NextResponse.json({ error: 'Failed to delete file' });
+  }
+
 }

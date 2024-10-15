@@ -26,7 +26,45 @@ export const getAccomodations = async (): Promise<Accomodation[]> => {
         return accomodations
     } catch (error) {
         console.log(error)
-        return error
+        throw error
     }
 }   
 
+export const deleteImages = async (images: string[]) => {
+    try {
+      const deleted = await Promise.all(images.map(async (image) => {
+        const url = new URL('/api/media', 'http://localhost:3000');
+        const res = await fetch(url, {
+            method: 'DELETE',
+            body: JSON.stringify({ id: image.split('/').pop() }),
+            headers: { 'Content-Type': 'application/json' },
+            credentials: 'include'
+        });
+        const data = await res.json();
+        return data;
+      }));
+      return deleted;
+    } catch (error) {
+      console.log(error);
+      throw error;
+    }
+  }
+
+export const deleteAccomodation = async (accomodation: Accomodation) => { 
+    try {    
+        const deleted = await deleteImages(accomodation.images)
+        if(deleted){
+            const deleteAccomodation = await db.accomodation.delete({
+                where: {
+                    type: accomodation.type
+                }
+            })
+            return deleteAccomodation
+        }
+        return deleted
+
+    } catch (error) {
+        console.log(error)
+        throw error
+    }
+}

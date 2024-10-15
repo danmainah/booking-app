@@ -1,20 +1,38 @@
+"use client";
+
+import { useRouter } from "next/navigation";
 import { getAccomodations } from "./_actions/accomodation";
 import AccomodationCard from "./_components/AccomodationCard";
+import { useEffect, useState } from "react";
+import { Accomodation } from "@/types";
 
-export default async function Admin() {
-    const data = await getAccomodations();
-    
-    if(data === undefined) return <p>loading...</p>
+export default function Admin() {
+  const router = useRouter();
+  const [data, setData] = useState<Accomodation[] | undefined>(undefined);
 
-    if(Array.isArray(data)) {
-        return (
-            <div className="flex flex-col gap-4">
-                {data.map((accomodation) => (
-                    <AccomodationCard data={accomodation} key={accomodation.type}/>
-                ))}
-            </div>
-        )
+  useEffect(() => {
+    getAccomodations().then(setData);
+  }, []);
+
+  if (data === undefined) return <p>loading...</p>;
+
+  if (Array.isArray(data)) {
+    if (data.length === 0) {
+      return <h3>No Accomodations</h3>;
     } else {
-        return <p>Error fetching accomodations</p>
+      return (
+        <div className="flex flex-col gap-4">
+          {data.map((accomodation) => (
+            <AccomodationCard
+              data={accomodation}
+              router={router}
+              key={accomodation.type}
+            />
+          ))}
+        </div>
+      );
     }
+  } else {
+    return <h3>Error loading Accomodations</h3>;
+  }
 }

@@ -32,23 +32,29 @@ export const getAccomodations = async (): Promise<Accomodation[]> => {
 
 export const deleteImages = async (images: string[]) => {
     try {
-      const deleted = await Promise.all(images.map(async (image) => {
-        const url = new URL('/api/media', 'http://localhost:3000');
-        const res = await fetch(url, {
-            method: 'DELETE',
-            body: JSON.stringify({ id: image.split('/').pop() }),
-            headers: { 'Content-Type': 'application/json' },
-            credentials: 'include'
-        });
-        const data = await res.json();
-        return data;
-      }));
-      return deleted;
+        const accomodations = await db.accomodation.findMany();
+        const usedImages = new Set(accomodations.flatMap(accommodation => accommodation.images));
+
+        const deleted = await Promise.all(images.map(async (image) => {
+            if (!usedImages.has(image)) {
+                const url = new URL('/api/media', 'http://localhost:3000');
+                const res = await fetch(url, {
+                    method: 'DELETE',
+                    body: JSON.stringify({ id: image.split('/').pop() }),
+                    headers: { 'Content-Type': 'application/json' },
+                    credentials: 'include'
+                });
+                const data = await res.json();
+                return data;
+            }
+        }));
+
+        return deleted;
     } catch (error) {
-      console.log(error);
-      throw error;
+        console.log(error);
+        throw error;
     }
-  }
+}
 
 export const deleteAccomodation = async (accomodation: Accomodation) => { 
     try {    

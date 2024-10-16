@@ -1,4 +1,4 @@
-"use client";
+'use client';
 
 import { useRouter } from "next/navigation";
 import { getAccomodations } from "./_actions/accomodation";
@@ -15,7 +15,12 @@ export default function Admin() {
     getAccomodations().then(setData);
   }, []);
 
-  if (data === undefined) return <p>loading...</p>;
+  if (data === undefined) return (
+    <div className="flex flex-col items-center justify-center mt-10">
+        <div className="animate-spin rounded-full h-32 w-32 border-b-8 border-gray-900" />
+        <p className="text-lg font-bold text-gray-900 mt-4">Loading...</p>
+      </div>
+  )
 
   if (Array.isArray(data)) {
     if (data.length === 0) {

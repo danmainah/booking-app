@@ -30,6 +30,19 @@ export const getAccomodations = async (): Promise<Accomodation[]> => {
     }
 }   
 
+export const getIndividualAccomodation = async (id: string) => {
+    try {
+        const accomodation = await db.accomodation.findUnique({
+            where: {
+                id
+            }
+        })
+        return accomodation
+    } catch (error) {
+        console.log(error)
+        throw error
+    }
+}
 export const deleteImages = async (images: string[]) => {
     try {
         const accomodations = await db.accomodation.findMany();
@@ -69,6 +82,21 @@ export const deleteAccomodation = async (accomodation: Accomodation) => {
         }
         return deleted
 
+    } catch (error) {
+        console.log(error)
+        throw error
+    }
+}
+
+export const updateAccomodation = async (accomodation: Accomodation) => {
+    try {
+        const update = await db.accomodation.update({
+            where: {
+                type: accomodation.type
+            },
+            data: accomodation
+        })
+        return update
     } catch (error) {
         console.log(error)
         throw error

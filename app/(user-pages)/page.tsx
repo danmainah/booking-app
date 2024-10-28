@@ -3,6 +3,7 @@ import { useEffect, useState } from "react";
 import { getAccomodations } from "../(admin-pages)/admin/_actions/accomodation";
 import Image from "next/image";
 import { Accomodation } from "@/types";
+import Link from "next/link";
 
 export default function Home() {
   const [data, setData] = useState<Accomodation[] | undefined>(undefined);
@@ -21,7 +22,7 @@ export default function Home() {
   return (
     <div>
       {data.map((accomodation) => (
-        <div key={accomodation.type}>
+        <Link href={`/booking/${accomodation.id}`} key={accomodation.type}>
         <div>
           <h3>{accomodation.type}</h3>
         </div>
@@ -32,7 +33,7 @@ export default function Home() {
             height={400}
             objectFit="cover" 
           />
-        </div>
+        </Link>
       ))}
     </div>
   )}

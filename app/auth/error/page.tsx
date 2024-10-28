@@ -1,6 +1,14 @@
+'use client';
+
+import { useSearchParams } from 'next/navigation';
+
 export default function Error() {
-    return (
-        <div>
-            <h1>Error</h1>
-        </div>
-    );
+  const search = useSearchParams();
+  const error = search.get('error');
+
+  return (
+    <div>
+      <h1>Error: {error}</h1>
+    </div>
+  );
+};

@@ -2,11 +2,11 @@ import NextAuth from "next-auth";
 import Credentials from "next-auth/providers/credentials";
 import GoogleProvider from "next-auth/providers/google";
 import { compare } from "bcryptjs";
-import type { Provider } from "next-auth/providers"
+import AuthenticationProvider from "next-auth";
 import { db } from "./lib/db";
 
 
-const providers: Provider[] = [
+const providers: AuthenticationProvider[] = [
     Credentials({
         name: "Password",
         credentials: {
@@ -62,7 +62,7 @@ const providers: Provider[] = [
       })
 ]
 
-export const {handlers, signIn, signOut, auth} = NextAuth({
+export default NextAuth({
     providers,
     pages: {
         signOut: '/auth/signout',
@@ -70,19 +70,27 @@ export const {handlers, signIn, signOut, auth} = NextAuth({
         newUser: '/auth/signup' // New users will be directed here on first sign in (leave the property out if not of interest)
       },
       callbacks: {
-        async jwt({ token, user }) {
+        async jwt({ token, user }: { token: any, user: any }) {
             if (user) {
                 token.id = user.id; // Add user ID to token
             }
             return token;
         },
         async session({ session, token }) {
-            if (token) {
-                session.user.id = token.id as string; // Add user ID to session
-                session.user.name = token.name; // Optional: add name if needed
-                session.user.email = token.email as string; // Optional: add email if needed
-            }
-            return session;
-        },
+          if (token) {
+              if (session.user) {
+                  session.user.id = token.id as string; // Add user ID to session
+                  session.user.name = token.name; // Optional: add name if needed
+                  session.user.email = token.email as string; // Optional: add email if needed
+              } else {
+                  session.user = {
+                      id: token.id as string,
+                      name: token.name,
+                      email: token.email as string,
+                  };
+              }
+          }
+          return session;
+      },
       },
 })

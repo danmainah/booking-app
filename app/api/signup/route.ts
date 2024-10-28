@@ -2,7 +2,7 @@ import { NextResponse } from "next/server";
 import { createUser } from "@/app/auth/_actions/user";
 
 //Handling POST request
-export async function POST(req: { json: () => any; }, res: NextResponse) {
+export async function POST(req: { json: () => any }) {
     const body = await req.json()
 
     try{
@@ -13,6 +13,8 @@ export async function POST(req: { json: () => any; }, res: NextResponse) {
             return NextResponse.json({error: 'User creation failed'})
         }
     } catch(error) {
-        return NextResponse.json({error})
+        if(error instanceof Error) {
+            return NextResponse.json({error: 'Something went wrong, while trying to create user'})
+        }
     }
 }

@@ -1,9 +1,10 @@
 "use client";
-import { useEffect, useState } from "react";
+import { use, useEffect, useState } from "react";
 import { getAccomodations } from "../(admin-pages)/admin/_actions/accomodation";
 import Image from "next/image";
 import { Accomodation } from "@/types";
 import Link from "next/link";
+import { signIn } from "next-auth/react";
 
 export default function Home() {
   const [data, setData] = useState<Accomodation[] | undefined>(undefined);
@@ -18,9 +19,12 @@ export default function Home() {
         <p className="text-lg font-bold text-gray-900 mt-4">Loading...</p>
       </div>
   )
+
+  const signInUrl = signIn()
  if(Array.isArray(data)) {
   return (
     <div>
+      <Link href={signInUrl} className="text-blue-500">Add new Accomodation</Link>
       {data.map((accomodation) => (
         <Link href={`/booking/${accomodation.id}`} key={accomodation.type}>
         <div>

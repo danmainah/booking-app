@@ -1,7 +1,5 @@
 import { db } from '@/lib/db';
 import { hashPassword } from '@/utils/password';
-import { redirect } from 'next/navigation';
-import { NextResponse } from 'next/server';
 import {z} from 'zod'
 
 const userSchema = z.object({
@@ -15,12 +13,13 @@ export async function createUser(credentials: z.infer<typeof userSchema>) {
     const data = userSchema.safeParse(credentials)   
 
     if(data.success === false){
+        console.log(data.error)
         return data.error.cause
     }
     
     const registedUser = await db.user.findUnique({
         where: {
-          email: { equals: credentials.email }
+          email: credentials.email
         }
       })
 
@@ -31,7 +30,7 @@ export async function createUser(credentials: z.infer<typeof userSchema>) {
             data: {
                 username: credentials.username,
                 email: credentials.email,
-                password: await hashPassword(credentials.password),
+                password: hashPassword(credentials.password),
                 role: credentials.role || 'user',
             },
         })

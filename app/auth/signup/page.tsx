@@ -46,11 +46,12 @@ export default function SignUpPage() {
       }
       // Process response based on success or error
       const apiResponse = await response.json();
+
       console.log(apiResponse)
       if(apiResponse.status === 201) {
-        router.push('/api/auth/signin?callbackUrl=http%3A%2F%2Flocalhost%3A3000%2F')
+        router.push('auth/signin')
       } else if (apiResponse.status === 409) { 
-        setError(apiResponse.error.name);
+        setError(apiResponse.data);
       } else{
         setError(apiResponse.error)
       }

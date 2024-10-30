@@ -5,3 +5,4 @@ export type Accomodation = {
     images: string[]
     available: boolean
   }
+

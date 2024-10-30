@@ -24,7 +24,7 @@ export async function createUser(credentials: z.infer<typeof userSchema>) {
       })
 
     if(registedUser){
-        return {data: "user already exists",status: 409}
+        return {data: "User already exists",status: 409}
     } else {
         const user = await db.user.create({
             data: {

@@ -29,7 +29,7 @@ const providers = [
     async profile(profile) {
       const user = await db.user.findUnique({ where: { email: profile.email } });
       if (!user) {
-        return { error: "No user found with email " + profile.email + "please signup first" };
+       throw new Error(`No user found with email ${profile.email}, please signup first.`);
       }
       return { id: profile.sub, name: profile.name, email: profile.email, image: profile.picture };
     },
@@ -41,7 +41,7 @@ export default NextAuth({
   callbacks: {
     async jwt({ token, user, error }) {
       if (error) {
-        throw new Error(error.message);
+        token.error = error.message;
       }
       if (user) token.id = user.id;
       return token;
@@ -57,8 +57,8 @@ export default NextAuth({
   },
   pages: {
     signIn: "/auth/signin",
-    signOut: "/auth/signout",
-    verifyRequest: "/", 
-    error: "/auth/error",
+    verifyRequest: "/",
+    error: "/auth/signin"
   },
 });
+

@@ -4,17 +4,20 @@ import { signIn } from "next-auth/react";
 import { useEffect, useState } from "react";
 import { useSearchParams } from "next/navigation";
 
+
 export default function SignInPage() {
     const router = useSearchParams();
     const [error, setError] = useState("");
-    const errorMessage = router.get('error');
+  
 
     useEffect(() => {
         // Capture error from query string if it exists
-        if (errorMessage) {
-            switch (errorMessage) {
+        const errorParam = router.get("error");
+        console.log(error)
+        if (errorParam) {
+            switch (errorParam) {
                 case "CredentialsSignin":
-                    setError("Invalid credentials. Please try again.");
+                    setError("Invalid credentials. Please check your email and password.");
                     break;
                 case "No user found with email":
                     setError("No user found with this email. Please sign up.");
@@ -23,16 +26,18 @@ export default function SignInPage() {
                     setError("An unexpected error occurred. Please try again.");
             }
         }
-    }, [errorMessage]); 
+    }, [error, router]); 
 
     const handleSignIn = (provider: string) => signIn(provider, { callbackUrl: "/" })
     .then((result) => {
         if(result?.status === 401) {
             setError(result.error?? "")
+            return
         }else {
             setError("")
         }
     }).catch((error) => {
+    
         console.log(error)
         setError(error.message)
     });

@@ -1,74 +1,62 @@
-'use client';
+"use client";
 
 import { signIn } from "next-auth/react";
-import { useEffect, useState } from "react";
+import { useState, useEffect } from "react";
 import { useSearchParams } from "next/navigation";
-
+import Link from "next/link";
 
 export default function SignInPage() {
-    const router = useSearchParams();
+    const searchParams = useSearchParams();
     const [error, setError] = useState("");
-  
-
+ 
     useEffect(() => {
-        // Capture error from query string if it exists
-        const errorParam = router.get("error");
-        console.log(error)
+        const errorParam = searchParams.get("error");
         if (errorParam) {
-            switch (errorParam) {
-                case "CredentialsSignin":
-                    setError("Invalid credentials. Please check your email and password.");
-                    break;
-                case "No user found with email":
-                    setError("No user found with this email. Please sign up.");
-                    break;
-                default:
-                    setError("An unexpected error occurred. Please try again.");
-            }
+            setError(errorParam);
         }
-    }, [error, router]); 
+    }, [searchParams]);
+    const handleSignIn = async (provider: string) => {
+        try {
+            await signIn(provider);
+        } catch (error) {
+            setError("An error occurred during sign-in. Please try again.");
+        }
+    };
 
-    const handleSignIn = (provider: string) => signIn(provider, { callbackUrl: "/" })
-    .then((result) => {
-        if(result?.status === 401) {
-            setError(result.error?? "")
-            return
-        }else {
-            setError("")
-        }
-    }).catch((error) => {
-    
-        console.log(error)
-        setError(error.message)
-    });
     return (
         <div className="w-96 md:w-72 lg:w-48 mx-auto align-center">
             <h1 className="text-2xl font-bold">Sign in</h1>
             {error && <div className="text-red-500">{error}</div>}
-            <button onClick={() => handleSignIn('google')} className="text-blue-500 m-3">Sign in with Google</button>
-            <form onSubmit={(e) => {
-                e.preventDefault();
-               const form = e.target as HTMLFormElement;
-               const email = (form.elements.namedItem('email') as HTMLInputElement).value;
-               const password = (form.elements.namedItem('password') as HTMLInputElement).value;
-               signIn('credentials', {email, password}).
-               then((result) => {
-                if(result?.status === 401) {
-                    setError(result.error?? "")
-                    return
-                }else {
-                    setError("")
-                }
-               }).catch((error) => {
-                setError(error.message)
-               });
-           }} className="flex flex-col gap-2">
+            <button onClick={() => handleSignIn("google")} className="text-blue-500 m-3">
+                Sign in with Google
+            </button>
+            <form
+                onSubmit={(e) => {
+                    e.preventDefault();
+                    const form = e.target as HTMLFormElement;
+                    const email = (form.elements.namedItem("email") as HTMLInputElement).value;
+                    const password = (form.elements.namedItem("password") as HTMLInputElement).value;
+                    signIn("credentials", { email, password })
+                        .then((result) => {
+                            if (result?.error) {
+                                setError(result.error);
+                            } else {
+                                setError("");
+                            }
+                        })
+                        .catch((error) => {
+                            setError("An unknown error occurred.");
+                        });
+                }}
+                className="flex flex-col gap-2"
+            >
                 <label htmlFor="email">Email</label>
-                <input type="email" id="email" name="email" />
+                <input type="email" id="email" name="email" required />
                 <label htmlFor="password">Password</label>
-                <input type="password" id="password" name="password" autoComplete="on"/>
+                <input type="password" id="password" name="password" autoComplete="on" required />
                 <button type="submit">Sign in</button>
             </form>
+            <Link href="/auth/signup" className="text-blue-500">Sign up</Link>
         </div>
-    ) 
+    );
 }

@@ -26,13 +26,6 @@ const providers = [
   Google({
     clientId: process.env.GOOGLE_ID || "",
     clientSecret: process.env.GOOGLE_SECRET || "",
-    async profile(profile) {
-      const user = await db.user.findUnique({ where: { email: profile.email } });
-      if (!user) {
-       throw new Error(`No user found with email ${profile.email}, please signup first.`);
-      }
-      return { id: profile.sub, name: profile.name, email: profile.email, image: profile.picture };
-    },
   }),
 ];
 
@@ -48,17 +41,29 @@ export default NextAuth({
     },
     async session({ session, token }) {
       if (token && session.user) {
-        session.user.id = token.id ;
-        session.user.name = token.name;
-        session.user.email = token.email;
+        session.user.id = token.id;
       }
       return session;
+    },
+    async signIn({ user, account }) {
+      try {
+        if (account && account.provider !== "credentials") {
+          const data = await db.user.findUnique({ where: { email: user.email } });
+          if (!data) {
+            throw new Error(`No user found with email ${user.email}, please signup first.`);
+          }
+        }
+        return true;
+      } catch (error: Error | any) {
+        return `/auth/signin?error=${encodeURIComponent(
+          error. response?.data?.message || "No user found with this email, please signup first"
+        )}`;
+      }
     },
   },
   pages: {
     signIn: "/auth/signin",
-    verifyRequest: "/",
-    error: "/auth/signin"
+    error: "/auth/signin",
   },
 });
 

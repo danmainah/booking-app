@@ -18,9 +18,9 @@ const providers = [
       }
       const isValid = await compare(credentials.password, user.password);
       if (!isValid){
-        throw new Error("Invalid password");
+        throw new Error("Kindly enter correct password");
       }
-      return { id: user.id, name: user.username, email: user.email };
+      return { id: user.id, name: user.username, email: user.email, role: user.role };
     },
   }),
   Google({
@@ -64,6 +64,7 @@ export default NextAuth({
   pages: {
     signIn: "/auth/signin",
     error: "/auth/signin",
+    signOut: "/",
   },
 });
 

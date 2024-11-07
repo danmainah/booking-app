@@ -13,7 +13,6 @@ export async function createUser(credentials: z.infer<typeof userSchema>) {
     const data = userSchema.safeParse(credentials)   
 
     if(data.success === false){
-        console.log(data.error)
         return data.error.cause
     }
     
@@ -23,8 +22,21 @@ export async function createUser(credentials: z.infer<typeof userSchema>) {
         }
       })
 
+    const no_other_user = await (await db.user.findMany()).length
+
     if(registedUser){
-        return {data: "User already exists",status: 409}
+        return {data: "User already exists kindly signin",status: 409}
+    } else if (no_other_user === 0) {
+        const user = await db.user.create({
+            data: {
+                username: credentials.username,
+                email: credentials.email,
+                password: hashPassword(credentials.password),
+                role: 'admin',
+            },
+        })
+
+        return {data: user,status: 201}
     } else {
         const user = await db.user.create({
             data: {

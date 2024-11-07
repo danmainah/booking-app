@@ -3,6 +3,7 @@
 import { useState } from 'react';
 import { z } from 'zod'; // Assuming you have Zod imported
 import { useRouter } from 'next/navigation'
+import Link from 'next/link';
 
 export default function SignUpPage() {
   const [email, setEmail] = useState('');
@@ -47,9 +48,8 @@ export default function SignUpPage() {
       // Process response based on success or error
       const apiResponse = await response.json();
 
-      console.log(apiResponse)
       if(apiResponse.status === 201) {
-        router.push('auth/signin')
+        router.push('/auth/signin')
       } else if (apiResponse.status === 409) { 
         setError(apiResponse.data);
       } else{
@@ -70,7 +70,7 @@ export default function SignUpPage() {
         <h3>Sign Up</h3>
       </div>
       <form onSubmit={handleSignUp}>
-      {error && typeof error === 'string' && <div className="text-red-500 text-center">{error}</div>}
+  
         <div>
           <label className='font-semibold mt-2'>Username</label>
           <input
@@ -115,6 +115,8 @@ export default function SignUpPage() {
         </div>
         <div className="justify-center">
           <button className="w-full rounded bg-blue-700">Register</button>
+          {error && typeof error === 'string' && <div className="text-red-500 text-center">{error}</div>}
+          <Link href="/auth/signin" className="text-blue-500">Login</Link>
         </div> 
       </form>
     </div>

@@ -2,7 +2,7 @@
 
 import { signIn } from "next-auth/react";
 import { useState, useEffect } from "react";
-import { useSearchParams } from "next/navigation";
+import { redirect, useSearchParams } from "next/navigation";
 import Link from "next/link";
 
 export default function SignInPage() {
@@ -17,7 +17,7 @@ export default function SignInPage() {
     }, [searchParams]);
     const handleSignIn = async (provider: string) => {
         try {
-            await signIn(provider);
+            await signIn(provider, { callbackUrl: "/" });
         } catch (error) {
             setError("An error occurred during sign-in. Please try again.");
         }
@@ -26,7 +26,6 @@ export default function SignInPage() {
     return (
         <div className="w-96 md:w-72 lg:w-48 mx-auto align-center">
             <h1 className="text-2xl font-bold">Sign in</h1>
-            {error && <div className="text-red-500">{error}</div>}
             <button onClick={() => handleSignIn("google")} className="text-blue-500 m-3">
                 Sign in with Google
             </button>
@@ -42,9 +41,10 @@ export default function SignInPage() {
                                 setError(result.error);
                             } else {
                                 setError("");
-                            }
+                            }   
                         })
                         .catch((error) => {
+                            console.log(error);
                             setError("An unknown error occurred.");
                         });
                 }}
@@ -56,6 +56,7 @@ export default function SignInPage() {
                 <input type="password" id="password" name="password" autoComplete="on" required />
                 <button type="submit">Sign in</button>
             </form>
+            {error && <div className="text-red-500">{error}</div>}
             <Link href="/auth/signup" className="text-blue-500">Sign up</Link>
         </div>
     );

@@ -3,6 +3,7 @@ import Credentials from "next-auth/providers/credentials";
 import Google from "next-auth/providers/google";
 import { compare } from "bcryptjs";
 import { db } from "./lib/db";
+import { redirect } from "next/dist/server/api-utils";
 
 const providers = [
   Credentials({

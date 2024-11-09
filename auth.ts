@@ -47,19 +47,13 @@ export default NextAuth({
       return session;
     },
     async signIn({ user, account }) {
-      try {
         if (account && account.provider !== "credentials") {
           const data = await db.user.findUnique({ where: { email: user.email } });
           if (!data) {
-            throw new Error(`No user found with email ${user.email}, please signup first.`);
+            return '/auth/signin?error=No user found with this email, please signup first';
           }
         }
         return true;
-      } catch (error: Error | any) {
-        return `/auth/signin?error=${encodeURIComponent(
-          error. response?.data?.message || "No user found with this email, please signup first"
-        )}`;
-      }
     },
   },
   pages: {

@@ -5,11 +5,12 @@ import { getIndividualAccomodation } from "@/app/(admin-pages)/admin/_actions/ac
 import { Accomodation } from "@/types";
 import { useEffect, useState } from "react";
 import Image from "next/image";
+import { useSession } from "next-auth/react";
 
 export default function Booking() {
     const router = useRouter();
     const id = useParams().id.toString();
-
+     const session = useSession();
     const [accomodation, setAccomodation] = useState<Accomodation>();
 
     useEffect(() => {
@@ -22,6 +23,8 @@ export default function Booking() {
     }
     fetchdata();
     }, [id]);
+
+    if(session === undefined || session.status === "unauthenticated") return router.push("/auth/signin");
     return (
         <div>
             <h1>Add A Booking</h1>

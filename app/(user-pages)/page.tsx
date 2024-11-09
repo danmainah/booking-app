@@ -4,10 +4,12 @@ import { getAccomodations } from "../(admin-pages)/admin/_actions/accomodation";
 import Image from "next/image";
 import { Accomodation } from "@/types";
 import Link from "next/link";
+import { signOut , useSession} from "next-auth/react";
 
 export default function Home() {
   const [data, setData] = useState<Accomodation[] | undefined>(undefined);
-  
+  const session = useSession();
+
   useEffect(() => {
     getAccomodations().then(setData);
   }, []);
@@ -23,7 +25,11 @@ export default function Home() {
  if(Array.isArray(data)) {
   return (
     <div>
-      <Link href="/auth/signin" className="text-blue-500">Login</Link>
+      {
+        session === undefined || session.status === "unauthenticated" ?
+        <Link href="/auth/signin" className="text-blue-500">Login</Link> :
+        <button onClick={() => signOut()} className="text-blue-500">Logout</button>
+      }
       {data.map((accomodation) => (
         <Link href={`/booking/${accomodation.id}`} key={accomodation.type}>
         <div>

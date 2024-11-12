@@ -6,3 +6,9 @@ export type Accomodation = {
     available: boolean
   }
 
+export type Booking = {
+    accomodation: string | undefined
+    author: string | undefined
+    checkIn: Date
+    checkOut: Date
+  }

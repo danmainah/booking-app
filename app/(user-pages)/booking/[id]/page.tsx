@@ -2,25 +2,31 @@
 
 import { useRouter, useParams } from "next/navigation";
 import { getIndividualAccomodation } from "@/app/(admin-pages)/admin/_actions/accomodation";
-import type { Accomodation, Booking } from "@/types";
+import type {Accomodation, Booking } from "@/types";
 import { useEffect, useState } from "react";
 import Image from "next/image";
 import { useSession } from "next-auth/react";
-import { set } from "zod";
 import { createBooking } from "../_actions/bookings";
 
 export default function Booking() {
   const router = useRouter();
   const id = useParams().id.toString();
   const session = useSession();
-  const [accomodation, setAccomodation] = useState<Accomodation>();
-  const [booking, setBooking] = useState<Booking>();
+  const user = session?.data?.user as any;
+
+  const [booking, setBooking] = useState<Booking>({
+    checkIn: new Date(),
+    checkOut: new Date(new Date().getTime() + 86400000),
+    accomodation: '',
+    author: "",
+  });
+  const [data, setData] = useState<Accomodation>();
 
   useEffect(() => {
     const fetchdata = async () => {
-      const data = await getIndividualAccomodation(id);
-      if (data && "type" in data) {
-        setAccomodation(data);
+      const result = await getIndividualAccomodation(id);
+      if (result && "type" in result) {
+        setData(result);
       }
     };
     fetchdata();
@@ -32,17 +38,18 @@ export default function Booking() {
 
   const handleSubmit = async () => {
      const booked = await createBooking({
-        accomodation: accomodation?.id,
-        author: id,
+        accomodation: id,
+        author: user?.id,
         checkIn: booking?.checkIn,
         checkOut: booking?.checkOut
      })
-
+     console.log(booked)
      if (!booked) {
         alert(`Error making the Reservation`);
         return;
       } else {
         alert(`Reservation Made Successfully`);
+        console.log(booked)
         router.push("/");
       }
   }
@@ -51,12 +58,12 @@ export default function Booking() {
     <div>
       <h1>Add A Booking</h1>
       <Image
-        src={accomodation?.images[0] ?? ""}
+        src={data?.images[0] ?? ""}
         width={400}
         height={400}
         alt="product image"
       />
-      <p>{accomodation?.type}</p>
+      <p>{data?.type}</p>
 
       <form className="max-w-md mx-auto p-4 bg-white rounded shadow-md"  onSubmit={handleSubmit}>
         <label

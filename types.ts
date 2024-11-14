@@ -7,8 +7,8 @@ export type Accomodation = {
   }
 
 export type Booking = {
-    accomodation: string | undefined
-    author: string | undefined
+    accomodation: string 
+    author: string 
     checkIn: Date
     checkOut: Date
   }

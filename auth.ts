@@ -3,7 +3,7 @@ import Credentials from "next-auth/providers/credentials";
 import Google from "next-auth/providers/google";
 import { compare } from "bcryptjs";
 import { db } from "./lib/db";
-import { redirect } from "next/dist/server/api-utils";
+
 
 const providers = [
   Credentials({
@@ -44,11 +44,12 @@ export default NextAuth({
       if (token && session.user) {
         session.user.id = token.id;
       }
+      console.log(session)
       return session;
     },
     async signIn({ user, account }) {
         if (account && account.provider !== "credentials") {
-          const data = await db.user.findUnique({ where: { email: user.email } });
+          const data = await db.user.findUnique({ where: { email: user.email?? "" } });
           if (!data) {
             return '/auth/signin?error=No user found with this email, please signup first';
           }

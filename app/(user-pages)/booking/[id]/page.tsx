@@ -14,12 +14,6 @@ export default function Booking() {
   const session = useSession();
   const user = session?.data?.user as any;
 
-  const [booking, setBooking] = useState<Booking>({
-    checkIn: new Date(),
-    checkOut: new Date(new Date().getTime() + 86400000),
-    accomodation: '',
-    author: "",
-  });
   const [data, setData] = useState<Accomodation>();
 
   useEffect(() => {
@@ -32,25 +26,30 @@ export default function Booking() {
     fetchdata();
   }, [id]);
 
+  const [booking, setBooking] = useState<Booking>({
+    checkIn: new Date(),
+    checkOut: new Date(new Date().getTime() + 86400000),
+    quarters: data?.id as string,
+    author: user?.id as string,
+  });
 
   if (session === undefined || session.status === "unauthenticated")
     return alert("Please login"), router.push("/auth/signin");
 
   const handleSubmit = async () => {
      const booked = await createBooking({
-        accomodation: id,
+        quarters: id,
         author: user?.id,
         checkIn: booking?.checkIn,
         checkOut: booking?.checkOut
      })
-     console.log(booked)
-     if (!booked) {
-        alert(`Error making the Reservation`);
-        return;
-      } else {
+     if (booked.status === 201) {
         alert(`Reservation Made Successfully`);
-        console.log(booked)
         router.push("/");
+        return
+      } else {
+        alert(booked.error);
+        router.refresh();
       }
   }
 

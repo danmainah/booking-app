@@ -35,9 +35,9 @@ model Accomodation {
 model Booking {
   id String @id @default(auto()) @map("_id") @db.ObjectId
   accomodationId String @db.ObjectId
-  accomodation Accomodation @relation(fields: [accomodationId], references: [id])
-  checkIn DateTime
-  checkOut DateTime
+  quarters Accomodation @relation(fields: [accomodationId], references: [id])
   authorId String @db.ObjectId
   author User @relation(fields: [authorId], references: [id])
+  checkIn DateTime
+  checkOut DateTime
 }

@@ -27,6 +27,19 @@ const providers = [
   Google({
     clientId: process.env.GOOGLE_ID || "",
     clientSecret: process.env.GOOGLE_SECRET || "",
+    async profile(profile) {
+      // Here you can fetch the user from your database using profile.email
+      const user = await db.user.findUnique({ where: { email: profile.email } });
+      
+      // Return a custom object with your database's user ID
+      return {
+        id: user ? user.id : null,
+        name: profile.name,
+        email: profile.email,
+        image: profile.picture,
+        role: user ? user.role : null,
+      };
+    },
   }),
 ];
 

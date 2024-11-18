@@ -1,7 +1,6 @@
 'use server'
 
 import { db } from "@/lib/db";
-import { stat } from "fs";
 
 export const createBooking = async (booking: any) => {
     try {
@@ -14,6 +13,7 @@ export const createBooking = async (booking: any) => {
             data: {
                 checkIn: booking.checkIn as Date,
                 checkOut: booking.checkOut as Date,
+                numberOfRooms: booking.numberOfRooms as number,
                 quarters: {
                     connect: {
                         id: booking.quarters as string

@@ -40,4 +40,5 @@ model Booking {
   author User @relation(fields: [authorId], references: [id])
   checkIn DateTime
   checkOut DateTime
+  numberOfRooms Int
 }

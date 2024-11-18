@@ -11,4 +11,5 @@ export type Booking = {
     author: string 
     checkIn: Date
     checkOut: Date
+    numberOfRooms: number
   }

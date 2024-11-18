@@ -31,17 +31,19 @@ export default function Booking() {
     checkOut: new Date(new Date().getTime() + 86400000),
     quarters: data?.id as string,
     author: user?.id as string,
+    numberOfRooms: 1
   });
 
   if (session === undefined || session.status === "unauthenticated")
     return alert("Please login"), router.push("/auth/signin");
-
+  console.log(user)
   const handleSubmit = async () => {
      const booked = await createBooking({
         quarters: id,
         author: user?.id,
         checkIn: booking?.checkIn,
-        checkOut: booking?.checkOut
+        checkOut: booking?.checkOut,
+        numberOfRooms: booking?.numberOfRooms
      })
      if (booked.status === 201) {
         alert(`Reservation Made Successfully`);
@@ -94,6 +96,20 @@ export default function Booking() {
           required
           min={new Date(new Date().getTime() + 86400000).toISOString().split('T')[0]}
           onChange={(e) => setBooking({ ...booking, checkOut: new Date(e.target.value) })}
+        />
+        <label
+          className="block text-gray-700 text-sm font-bold mb-2"
+          htmlFor="number-of-rooms"
+        >
+          Number of Rooms:
+        </label>
+        <input
+          className="appearance-none block w-full bg-gray-200 text-gray-700 border border-gray-200 rounded py-3 px-4 leading-tight focus:outline-none focus:bg-white focus:border-gray-500"
+          type="number"
+          id="number-of-rooms"
+          name="number-of-rooms"
+          required
+          onChange={(e) => setBooking({ ...booking, numberOfRooms: parseInt(e.target.value) })}
         />
         <button
           className="bg-orange-500 hover:bg-orange-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline"

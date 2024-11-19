@@ -27,19 +27,6 @@ const providers = [
   Google({
     clientId: process.env.GOOGLE_ID || "",
     clientSecret: process.env.GOOGLE_SECRET || "",
-    async profile(profile) {
-      // Here you can fetch the user from your database using profile.email
-      const user = await db.user.findUnique({ where: { email: profile.email } });
-      
-      // Return a custom object with your database's user ID
-      return {
-        id: user ? user.id : null,
-        name: profile.name,
-        email: profile.email,
-        image: profile.picture,
-        role: user ? user.role : null,
-      };
-    },
   }),
 ];
 
@@ -53,9 +40,12 @@ export default NextAuth({
       if (user) token.id = user.id;
       return token;
     },
-    async session({ session, token }) {
+    async session({ session, token}) {
       if (token && session.user) {
-        session.user.id = token.id;
+        const user = await db.user.findUnique({ where: { email: session.user.email!} });
+        if (user) {
+          session.user.id = user.id;
+        }
       }
       console.log(session)
       return session;

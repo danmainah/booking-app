@@ -20,7 +20,6 @@ export default function Home() {
         <p className="text-lg font-bold text-gray-900 mt-4">Loading...</p>
       </div>
   )
-  console.log(session)
  if(Array.isArray(data)) {
   return (
     <div>

@@ -9,7 +9,6 @@ export default function SignInPage() {
     const searchParams = useSearchParams();
     const [error, setError] = useState("");
 
-
     useEffect(() => {
         const errorParam = searchParams.get("error");
         if (errorParam) {

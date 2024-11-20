@@ -33,6 +33,7 @@ export default function Home() {
         <div>
           <h3>{accomodation.type}</h3>
         </div>
+        <div>{accomodation.no_of_rooms} rooms</div>
         <Image
             src={accomodation.images[0]}
             alt="product image"

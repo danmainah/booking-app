@@ -36,7 +36,6 @@ export default function Booking() {
 
   if (session === undefined || session.status === "unauthenticated")
     return alert("Please login"), router.push("/auth/signin");
-  console.log(user)
   const handleSubmit = async () => {
      const booked = await createBooking({
         quarters: id,
@@ -47,7 +46,7 @@ export default function Booking() {
      })
      if (booked.status === 201) {
         alert(`Reservation Made Successfully`);
-        router.push("/");
+        router.push("/reservations");
         return
       } else {
         alert(booked.error);

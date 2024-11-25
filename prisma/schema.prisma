@@ -30,8 +30,16 @@ model Accomodation {
   images String[]
   available Boolean @default(true)
   bookings Booking[]
+  capacityByDates CapacityByDate[]
 }
 
+model CapacityByDate {
+  id String @id @default(auto()) @map("_id") @db.ObjectId
+  date DateTime
+  capacity Int
+  accomodation Accomodation @relation(fields: [accomodationId], references: [id])
+  accomodationId String @db.ObjectId
+}
 model Booking {
   id String @id @default(auto()) @map("_id") @db.ObjectId
   accomodationId String @db.ObjectId

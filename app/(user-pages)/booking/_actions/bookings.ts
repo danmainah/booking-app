@@ -14,7 +14,7 @@ export const createBooking = async (booking: any) => {
   }
 
   // Check if the booking meets the capacity criteria
-  const maxBookableRooms = await getMaxBookableRooms(accomodation, booking.checkIn);
+  const maxBookableRooms = await getMaxBookableRooms(booking.quarters, booking.checkIn);
   if (booking.numberOfRooms > maxBookableRooms) {
     throw new Error(`Cannot book ${booking.numberOfRooms} rooms, only ${maxBookableRooms} rooms available`);
   }
@@ -32,16 +32,15 @@ export const createBooking = async (booking: any) => {
 
   // Update the accomodation capacity
   await updateAccomodationCapacity(accomodation, booking.checkIn, booking.numberOfRooms);
-
-  return newBooking;
+  return {status:201, booking: newBooking};
 };
 
 // Create a method to get the maximum bookable rooms in a given day
-export const getMaxBookableRooms = async (accomodation: Accomodation, date: Date) => {
+export const getMaxBookableRooms = async (quarters: string, date: Date) => {
   // Get the existing bookings for the accomodation on the given date
   const existingBookings = await db.booking.findMany({
     where: {
-      quarters: accomodation.id,
+      quarters: { eq: quarters },
       checkIn: {
         gte: date,
         lt: new Date(date.getTime() + 86400000), // 86400000 is the number of milliseconds in a day

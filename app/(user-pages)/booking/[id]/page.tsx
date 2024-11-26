@@ -44,6 +44,7 @@ export default function Booking() {
         checkOut: booking?.checkOut,
         numberOfRooms: booking?.numberOfRooms
      })
+     console.log(booked)
      if (booked.status === 201) {
         alert(`Reservation Made Successfully`);
         router.push("/reservations");
@@ -93,7 +94,7 @@ export default function Booking() {
           id="check-out"
           name="check-out"
           required
-          min={new Date(new Date().getTime() + 86400000).toISOString().split('T')[0]}
+          min={new Date(booking.checkIn.getTime() + 86400000).toISOString().split('T')[0]}
           onChange={(e) => setBooking({ ...booking, checkOut: new Date(e.target.value) })}
         />
         <label

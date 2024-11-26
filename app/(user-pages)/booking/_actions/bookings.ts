@@ -1,101 +1,68 @@
-'use server'
+import type { Accomodation } from "@/types";
 
 import { db } from "@/lib/db";
 
-const updateCapacityForDay = async (quartersId: string, capacity: number, date: Date) => {
-    try {
-      const dateTime = new Date(date)
-      const update = await db.accomodation.update({
-        where: {
-          id: quartersId
-        },
-        data: {
-          capacityByDates: {
-            create: {
-                date: dateTime,
-              capacity: capacity
-            }
-          }
-        }
-      })
-      return update
-    } catch (error) {
-      console.log(error)
-      throw error
-    }
-  }
-
-  const getCapacityForDay = async (quartersId: string, date: Date, capacity: number) => {
-    try {
-      const available = await db.accomodation.findUnique({
-        where: {
-          id: quartersId
-        },
-        select: {
-          capacityByDates:{
-            where: {
-              date: date,
-              capacity: capacity
-            }
-          }
-        }
-      })
-      return available
-    } catch (error) {
-      console.log(error)
-      throw error
-    }
-  }
-
-
 export const createBooking = async (booking: any) => {
-    try {
-        // Validate input data
-        if (!booking.quarters || !booking.author || !booking.checkIn || !booking.checkOut) {
-            throw new Error("Missing required booking information.");
-        }
+  // Get the accomodation details
+  const accomodation = await db.accomodation.findUnique({
+    where: { id: booking.quarters },
+  });
 
-  // Calculate the number of days between checkIn and checkOut
-  const numDays = Math.round((booking.checkOut.getTime() - booking.checkIn.getTime()) / (1000 * 3600 * 24));
+  // Check if the accomodation exists
+  if (!accomodation) {
+    throw new Error(`Accomodation not found with id ${booking.quarters}`);
+  }
 
-  // Check if the booking is valid for each day
-  for (let i = 0; i <= numDays; i++) {
-    const date = new Date(booking.checkIn.getTime() + (i * 1000 * 3600 * 24));
-    const capacity = await getCapacityForDay(booking.quarters, date);
-    if (capacity < booking.numberOfRooms) {
-      throw new Error(`Not enough capacity for ${booking.quarters} on ${date.toISOString()}`);
-    }
+  // Check if the booking meets the capacity criteria
+  const maxBookableRooms = await getMaxBookableRooms(accomodation, booking.checkIn);
+  if (booking.numberOfRooms > maxBookableRooms) {
+    throw new Error(`Cannot book ${booking.numberOfRooms} rooms, only ${maxBookableRooms} rooms available`);
   }
 
   // Create the booking
-  const create = await db.booking.create({
+  const newBooking = await db.booking.create({
     data: {
-      checkIn: booking.checkIn as Date,
-      checkOut: booking.checkOut as Date,
-      numberOfRooms: booking.numberOfRooms as number,
-      quarters: {
-        connect: {
-          id: booking.quarters as string
-        }
-      },
-      author: {
-        connect: {
-          id: booking.author as string
-        }
-      },
-    }
+      quarters: booking.quarters,
+      author: booking.author,
+      checkIn: booking.checkIn,
+      checkOut: booking.checkOut,
+      numberOfRooms: booking.numberOfRooms,
+    },
   });
 
-  // Update the capacity for each day
-  for (let i = 0; i < numDays; i++) {
-    const date = new Date(booking.checkIn.getTime() + (i * 1000 * 3600 * 24));
-    await updateCapacityForDay(booking.quarters, date, booking.numberOfRooms);
-  }
+  // Update the accomodation capacity
+  await updateAccomodationCapacity(accomodation, booking.checkIn, booking.numberOfRooms);
 
-  return { status: 201, data: create };
-        
-    } catch (error) {
-        console.error("Error creating booking:", error);
-        return { error: error.message || "An unknown error occurred." };
-    }
-}
+  return newBooking;
+};
+
+// Create a method to get the maximum bookable rooms in a given day
+export const getMaxBookableRooms = async (accomodation: Accomodation, date: Date) => {
+  // Get the existing bookings for the accomodation on the given date
+  const existingBookings = await db.booking.findMany({
+    where: {
+      quarters: accomodation.id,
+      checkIn: {
+        gte: date,
+        lt: new Date(date.getTime() + 86400000), // 86400000 is the number of milliseconds in a day
+      },
+    },
+  });
+
+  // Calculate the total rooms booked
+  const totalBookedRooms = existingBookings.reduce((acc, booking) => acc + booking.numberOfRooms, 0);
+
+  // Return the maximum bookable rooms
+  return accomodation.no_of_rooms - totalBookedRooms;
+};
+
+// Create a method to update the accomodation capacity
+const updateAccomodationCapacity = async (accomodation: Accomodation, date: Date, roomsBooked: number) => {
+  // Update the accomodation capacity
+  await db.accomodation.update({
+    where: { id: accomodation.id },
+    data: {
+      available: accomodation.no_of_rooms - roomsBooked > 0,
+    },
+  });
+};

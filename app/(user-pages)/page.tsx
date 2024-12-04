@@ -14,12 +14,13 @@ export default function Home() {
     getAccomodations().then(setData);
   }, []);
 
-  if(data === undefined || data.length === 0) return (
+  if(data === undefined ) return (
     <div className="flex flex-col items-center justify-center mt-10">
         <div className="animate-spin rounded-full h-32 w-32 border-b-8 border-blue-600" />
         <p className="text-lg font-bold text-gray-900 mt-4">Loading...</p>
       </div>
   )
+  if(data.length === 0) return <div>No accomodations</div>
  if(Array.isArray(data)) {
   return (
     <div>
@@ -28,6 +29,9 @@ export default function Home() {
         <Link href="/auth/signin" className="text-blue-500">Login</Link> :
         <button onClick={() => signOut()} className="text-blue-500">Logout</button>
       }
+      <div>
+        <Link href="/reservations" className="text-blue-500">My Reservations</Link>
+      </div>
       {data.map((accomodation) => (
         <Link href={`/booking/${accomodation.id}`} key={accomodation.type}>
         <div>

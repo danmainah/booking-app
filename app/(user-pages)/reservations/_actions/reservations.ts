@@ -18,3 +18,17 @@ export const getReservations = async (id: string) => {
         throw error
     }   
 }
+
+export const deleteReservation = async (id: string) => {
+    try {
+        const deleted = await db.booking.delete({
+            where: {
+                id
+            }
+        })
+        return deleted
+    } catch (error) {
+        console.log(error)
+        throw error
+    }
+}

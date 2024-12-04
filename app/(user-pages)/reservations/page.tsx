@@ -1,6 +1,6 @@
 "use client";
 import {useEffect, useState } from "react";
-import { getReservations } from "./_actions/reservations";
+import { getReservations, deleteReservation } from "./_actions/reservations";
 import { useSession } from "next-auth/react";
 
 export default function Reservations() {
@@ -28,6 +28,16 @@ export default function Reservations() {
             <p className="text-lg font-bold text-gray-900 mt-4">You have no bookings</p>
           </div>
     )
+
+    const removeReservation = async (id: string) => {
+        const deleted = await deleteReservation(id)
+        if(deleted){
+          alert(`Reservation deleted successfully`)
+           setData(data.filter((reservation) => reservation.id !== id))
+        } else {
+          alert(`Error deleting reservation`)
+        }
+    }
     return (
         data.map((reservation) => (
           <div key={reservation.id}>
@@ -35,6 +45,8 @@ export default function Reservations() {
             <p>{reservation.checkIn.toString()}</p>
             <p>{reservation.checkOut.toString()}</p>
             <p>{reservation.numberOfRooms}</p>
+            <button onClick={() => removeReservation(reservation.id)}
+              className="bg-red-500 hover:bg-red-700 text-white font-bold py-1 px-2 rounded">Delete</button>
           </div>
         ))
         

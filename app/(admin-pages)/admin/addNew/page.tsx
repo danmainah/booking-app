@@ -61,7 +61,7 @@ const AddAccomodation = () => {
   };
   return (
     <div className="max-w-3xl mx-auto p-4 mt-10 bg-white rounded-md shadow-md">
-      <h2 className="text-lg font-bold mb-4">Add Clothing Product</h2>
+      <h2 className="text-lg font-bold mb-4">Add New Accomodation</h2>
       <form onSubmit={handleSubmit}>
         <div className="form-group mb-3">
           <label htmlFor="type">Type </label>

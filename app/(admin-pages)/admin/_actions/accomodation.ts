@@ -11,7 +11,8 @@ export const createAccomodation = async (product: object) => {
 
         return create
     } catch (error) {
-        return error
+        console.error(error)
+        return { error: 'Failed to create accomodation' }
     }
 }
 

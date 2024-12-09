@@ -16,7 +16,7 @@ export const createBooking = async (booking: any) => {
   // Check if the booking meets the capacity criteria
   const maxBookableRooms = await getMaxBookableRooms(booking.quarters, booking.checkIn);
   if (booking.numberOfRooms > maxBookableRooms) {
-    throw new Error(`Cannot book ${booking.numberOfRooms} rooms, only ${maxBookableRooms} rooms available`);
+    return (`Cannot book ${booking.numberOfRooms} rooms, only ${maxBookableRooms} rooms available`);
   }
 
   // Create the booking
@@ -32,7 +32,7 @@ export const createBooking = async (booking: any) => {
 
   // Update the accomodation capacity
   await updateAccomodationCapacity(accomodation, booking.checkIn, booking.numberOfRooms);
-  return {status:201, booking: newBooking};
+  return {status: 201, booking: newBooking};
 };
 
 // Create a method to get the maximum bookable rooms in a given day

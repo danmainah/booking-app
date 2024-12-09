@@ -10,6 +10,9 @@ export const getReservations = async (id: string) => {
                 author: {
                     id: id
                 }
+            },
+            include: {
+                quarters: true
             }
         })
         return reservations

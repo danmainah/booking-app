@@ -44,14 +44,11 @@ export default function Booking() {
         checkOut: booking?.checkOut,
         numberOfRooms: booking?.numberOfRooms
      })
-     console.log(booked)
      if (booked.status === 201) {
         alert(`Reservation Made Successfully`);
         router.push("/reservations");
-        return
       } else {
-        alert(booked.error);
-        router.refresh();
+        alert("Error occured");
       }
   }
 

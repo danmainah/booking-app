@@ -45,10 +45,10 @@ export default function Booking() {
         numberOfRooms: booking?.numberOfRooms
      })
      if (booked.status === 201) {
-        alert(`Reservation Made Successfully`);
         router.push("/reservations");
       } else {
-        alert("Error occured");
+        console.log(booked)
+        alert(booked.error);
       }
   }
 
